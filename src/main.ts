@@ -43,13 +43,15 @@ export class AppContainer extends LitElement {
     flex-wrap: wrap;
     height: 100vh;
     /* background-color: #949494; */
+    max-width: 100vh;
+    margin: 0 auto;
   }
   .box {
     display: inline-block;
     width:calc(100% / 3);
     height:calc(100% / 3);
     box-sizing: border-box;
-    background-color: #cecece;
+    /* background-color: #cecece; */
   }
   `
 
@@ -91,7 +93,7 @@ export class AppContainer extends LitElement {
       <div class=box></div>
 
       <simon-button index=2 color="blue" class=box audio=71></simon-button>
-      <div class=box style="background-color:white;display:flex;flex-direction:column;justify-content:center;align-items:center;font-size:2em">${this.feedback}</div>
+      <div class=box style="background-color:white;display:flex;flex-direction:column;justify-content:center;align-items:center;font-size:2em;">${this.feedback}</div>
       <simon-button index=3 color="red" class=box audio=78></simon-button>
 
       <div class=box></div>
@@ -144,7 +146,13 @@ export class AppContainer extends LitElement {
         this.shadowRoot!.querySelector('mwc-button')?.click()
       })
     })
+
+
+    // window.addEventListener('resize', e => {
+    //   console.log('test')
+    // })
   }
+
 
   compareLines () {
     for (let i = 0; i < this.testline.length; ++i) {
