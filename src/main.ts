@@ -11,6 +11,14 @@ import './simon-button.js'
 import { SimonButton } from './simon-button.js'
 import { playAudio, sleep } from './utils.js'
 
+export const states = {
+  FREE: 1,
+  CPU: 2,
+  TEST: 3
+} as const;
+
+type ValueOf<T> = T[keyof T];
+
 declare global {
   interface Window {
     app: AppContainer;
@@ -23,7 +31,8 @@ export class AppContainer extends LitElement {
   private level = 3;
   private line: number[] = []
   private testline: number[] = []
-  @state() cpuMode = true;
+  // @state() cpuMode = true;
+  @state() state: ValueOf<typeof states> = 1;
 
   @state() feedback: string|TemplateResult = '';
 
@@ -65,7 +74,7 @@ export class AppContainer extends LitElement {
 
   async playLine () {
     this.feedback = `level ${this.level}`
-    this.cpuMode = true
+    this.state = states.CPU
     for (let i = 0; i < this.level; ++i) {
       // await (this.getButtonFromIndex(this.line[i]).push())
       await this.getButtonFromIndex(this.line[i]).push()
@@ -73,7 +82,7 @@ export class AppContainer extends LitElement {
     }
 
     this.testline = []
-    this.cpuMode = false
+    this.state = states.TEST
   }
 
   getRandomSimonButton () {
@@ -118,12 +127,16 @@ export class AppContainer extends LitElement {
     const buttons = this.simonButtons
     buttons.forEach(b => {
       b.addEventListener('pushed', () => {
-        this.testline.push(b.index)
-        this.compareLines()
         buttons.forEach(b2 => {
           if (b2 == b) { return }
           b2.resolvePush()
         })
+
+        // test
+        if (this.state === states.TEST) {
+          this.testline.push(b.index)
+          this.compareLines()
+        }
       })
     })
 
@@ -174,7 +187,7 @@ export class AppContainer extends LitElement {
 
   gameOver () {
     playAudio(`sounds/fart.mp3`)
-    this.cpuMode = true
+    this.state = states.FREE
     this.feedback = html`
     Level ${this.level}<br>
     GAME OVER<br>
@@ -183,11 +196,10 @@ export class AppContainer extends LitElement {
       this.playLine()
     }}>retry</mwc-button>
     `
-    this.cpuMode
   }
 
   async success() {
-    this.cpuMode = true
+    this.state = states.CPU
     this.level++;
     this.addRandomButtonToTheLine()
     this.feedback = `level ${this.level}`

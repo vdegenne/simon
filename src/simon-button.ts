@@ -1,5 +1,6 @@
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { states } from './main.js';
 
 @customElement('simon-button')
 export class SimonButton extends LitElement {
@@ -22,7 +23,7 @@ export class SimonButton extends LitElement {
   constructor () {
     super()
     this.addEventListener('click', () => {
-      if (window.app.cpuMode) {
+      if (window.app.state == states.CPU) {
         return
       }
       this.dispatchEvent(new CustomEvent('pushed'))

@@ -2484,7 +2484,7 @@ let SimonButton = class SimonButton extends s$1 {
         super();
         this.color = '';
         this.addEventListener('click', () => {
-            if (window.app.cpuMode) {
+            if (window.app.state == states.CPU) {
                 return;
             }
             this.dispatchEvent(new CustomEvent('pushed'));
@@ -2558,13 +2558,19 @@ function playAudio(path) {
     Sound.audio.play();
 }
 
+const states = {
+    FREE: 1,
+    CPU: 2,
+    TEST: 3
+};
 let AppContainer = class AppContainer extends s$1 {
     constructor() {
         super(...arguments);
         this.level = 3;
         this.line = [];
         this.testline = [];
-        this.cpuMode = true;
+        // @state() cpuMode = true;
+        this.state = 1;
         this.feedback = '';
     }
     reset() {
@@ -2582,14 +2588,14 @@ let AppContainer = class AppContainer extends s$1 {
     }
     async playLine() {
         this.feedback = `level ${this.level}`;
-        this.cpuMode = true;
+        this.state = states.CPU;
         for (let i = 0; i < this.level; ++i) {
             // await (this.getButtonFromIndex(this.line[i]).push())
             await this.getButtonFromIndex(this.line[i]).push();
             await sleep(250);
         }
         this.testline = [];
-        this.cpuMode = false;
+        this.state = states.TEST;
     }
     getRandomSimonButton() {
         const buttons = this.simonButtons;
@@ -2627,14 +2633,17 @@ let AppContainer = class AppContainer extends s$1 {
         const buttons = this.simonButtons;
         buttons.forEach(b => {
             b.addEventListener('pushed', () => {
-                this.testline.push(b.index);
-                this.compareLines();
                 buttons.forEach(b2 => {
                     if (b2 == b) {
                         return;
                     }
                     b2.resolvePush();
                 });
+                // test
+                if (this.state === states.TEST) {
+                    this.testline.push(b.index);
+                    this.compareLines();
+                }
             });
         });
         /* controller */
@@ -2675,7 +2684,7 @@ let AppContainer = class AppContainer extends s$1 {
     }
     gameOver() {
         playAudio(`sounds/fart.mp3`);
-        this.cpuMode = true;
+        this.state = states.FREE;
         this.feedback = y `
     Level ${this.level}<br>
     GAME OVER<br>
@@ -2684,10 +2693,9 @@ let AppContainer = class AppContainer extends s$1 {
             this.playLine();
         }}>retry</mwc-button>
     `;
-        this.cpuMode;
     }
     async success() {
-        this.cpuMode = true;
+        this.state = states.CPU;
         this.level++;
         this.addRandomButtonToTheLine();
         this.feedback = `level ${this.level}`;
@@ -2717,7 +2725,7 @@ AppContainer.styles = i$5 `
   `;
 __decorate([
     t$1()
-], AppContainer.prototype, "cpuMode", void 0);
+], AppContainer.prototype, "state", void 0);
 __decorate([
     t$1()
 ], AppContainer.prototype, "feedback", void 0);
@@ -2728,4 +2736,4 @@ AppContainer = __decorate([
     e$6('app-container')
 ], AppContainer);
 
-export { AppContainer };
+export { AppContainer, states };
