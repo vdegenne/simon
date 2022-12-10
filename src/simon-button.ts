@@ -15,7 +15,7 @@ export class SimonButton extends LitElement {
     display: block;
     cursor: pointer;
     /* border-radius: 25%; */
-    opacity: .5;
+    opacity: .7;
   }
   `
 
@@ -53,7 +53,7 @@ export class SimonButton extends LitElement {
       this.pushReleaseTimeout = undefined
     }
     if (this.pushResolve) {
-      this.style.opacity = '0.5'
+      this.style.opacity = '0.7'
       this.pushResolve()
     }
   }

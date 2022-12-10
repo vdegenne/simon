@@ -9,7 +9,7 @@ import '@material/mwc-button'
 import gamecontrol from 'gamecontroller.js'
 import './simon-button.js'
 import { SimonButton } from './simon-button.js'
-import { sleep } from './utils.js'
+import { playAudio, sleep } from './utils.js'
 
 declare global {
   interface Window {
@@ -31,6 +31,7 @@ export class AppContainer extends LitElement {
 
   reset () {
     this.level = 3
+    this.line = []
     for (let i = 0; i < this.level; ++i) {
       this.addRandomButtonToTheLine()
     }
@@ -41,13 +42,14 @@ export class AppContainer extends LitElement {
     display: flex;
     flex-wrap: wrap;
     height: 100vh;
-    background-color: #d4d4d4;
+    /* background-color: #949494; */
   }
   .box {
     display: inline-block;
     width:calc(100% / 3);
     height:calc(100% / 3);
     box-sizing: border-box;
+    background-color: #cecece;
   }
   `
 
@@ -163,11 +165,12 @@ export class AppContainer extends LitElement {
   }
 
   gameOver () {
+    playAudio(`sounds/fart.mp3`)
     this.cpuMode = true
-    this.feedback = html`GAME OVER<br>
+    this.feedback = html`
     Level ${this.level}<br>
+    GAME OVER<br>
     <mwc-button unelevated @click=${()=>{
-      this.feedback = `level ${this.level}`
       this.reset()
       this.playLine()
     }}>retry</mwc-button>
@@ -176,9 +179,10 @@ export class AppContainer extends LitElement {
   }
 
   async success() {
+    this.cpuMode = true
     this.level++;
-    this.feedback = `level ${this.level}`
     this.addRandomButtonToTheLine()
+    this.feedback = `level ${this.level}`
     await sleep(2000)
     this.playLine()
   }

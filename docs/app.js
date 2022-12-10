@@ -2512,7 +2512,7 @@ let SimonButton = class SimonButton extends s$1 {
             this.pushReleaseTimeout = undefined;
         }
         if (this.pushResolve) {
-            this.style.opacity = '0.5';
+            this.style.opacity = '0.7';
             this.pushResolve();
         }
     }
@@ -2526,7 +2526,7 @@ SimonButton.styles = i$5 `
     display: block;
     cursor: pointer;
     /* border-radius: 25%; */
-    opacity: .5;
+    opacity: .7;
   }
   `;
 __decorate([
@@ -2545,6 +2545,18 @@ SimonButton = __decorate([
 async function sleep(timeoutMs = 1000) {
     return await new Promise(r => setTimeout(r, timeoutMs));
 }
+const sounds = [];
+function playAudio(path) {
+    let Sound = sounds.find(s => s.path === path);
+    if (!Sound) {
+        Sound = {
+            path,
+            audio: new Audio(path)
+        };
+        sounds.push(Sound);
+    }
+    Sound.audio.play();
+}
 
 let AppContainer = class AppContainer extends s$1 {
     constructor() {
@@ -2557,6 +2569,7 @@ let AppContainer = class AppContainer extends s$1 {
     }
     reset() {
         this.level = 3;
+        this.line = [];
         for (let i = 0; i < this.level; ++i) {
             this.addRandomButtonToTheLine();
         }
@@ -2658,11 +2671,12 @@ let AppContainer = class AppContainer extends s$1 {
         }
     }
     gameOver() {
+        playAudio(`sounds/fart.mp3`);
         this.cpuMode = true;
-        this.feedback = y `GAME OVER<br>
+        this.feedback = y `
     Level ${this.level}<br>
+    GAME OVER<br>
     <mwc-button unelevated @click=${() => {
-            this.feedback = `level ${this.level}`;
             this.reset();
             this.playLine();
         }}>retry</mwc-button>
@@ -2670,9 +2684,10 @@ let AppContainer = class AppContainer extends s$1 {
         this.cpuMode;
     }
     async success() {
+        this.cpuMode = true;
         this.level++;
-        this.feedback = `level ${this.level}`;
         this.addRandomButtonToTheLine();
+        this.feedback = `level ${this.level}`;
         await sleep(2000);
         this.playLine();
     }
@@ -2685,13 +2700,14 @@ AppContainer.styles = i$5 `
     display: flex;
     flex-wrap: wrap;
     height: 100vh;
-    background-color: #d4d4d4;
+    /* background-color: #949494; */
   }
   .box {
     display: inline-block;
     width:calc(100% / 3);
     height:calc(100% / 3);
     box-sizing: border-box;
+    background-color: #cecece;
   }
   `;
 __decorate([
